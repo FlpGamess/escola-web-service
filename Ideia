@@ -1,0 +1,46 @@
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+public class ExcelReader {
+
+    public static void lerColunas(String caminhoArquivo) {
+        List<String> coluna1 = new ArrayList<>();
+        List<String> coluna3 = new ArrayList<>();
+
+        try (FileInputStream fis = new FileInputStream(caminhoArquivo);
+             Workbook workbook = new XSSFWorkbook(fis)) {
+
+            Sheet sheet = workbook.getSheetAt(0); // Lê a primeira planilha
+
+            for (Row row : sheet) {
+                // Lê a coluna 0 (primeira)
+                Cell cell0 = row.getCell(0);
+                if (cell0 != null) {
+                    coluna1.add(cell0.toString());
+                }
+
+                // Lê a coluna 2 (terceira)
+                Cell cell2 = row.getCell(2);
+                if (cell2 != null) {
+                    coluna3.add(cell2.toString());
+                }
+            }
+
+            // Exemplo: imprimir os resultados
+            System.out.println("Coluna 1: " + coluna1);
+            System.out.println("Coluna 3: " + coluna3);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void main(String[] args) {
+        lerColunas("caminho/do/seu/arquivo.xlsx");
+    }
+}
