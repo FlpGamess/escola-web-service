@@ -1,0 +1,92 @@
+import org.apache.poi.openxml4j.opc.OPCPackage;
+import org.apache.poi.xssf.eventusermodel.XSSFReader;
+import org.apache.poi.xssf.model.SharedStringsTable;
+import org.apache.poi.xssf.usermodel.XSSFRichTextString;
+import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.DefaultHandler;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+import java.io.InputStream;
+
+public class ExcelStreamingReader {
+
+    public static void main(String[] args) throws Exception {
+        // Caminho do seu arquivo Excel grande
+        String filePath = "caminho/para/seu/arquivo.xlsx";
+
+        // Abrir o arquivo no modo streaming (não carrega tudo na memória)
+        OPCPackage pkg = OPCPackage.open(filePath);
+        XSSFReader reader = new XSSFReader(pkg);
+
+        // Tabela de strings compartilhadas (Excel usa isso para otimizar)
+        SharedStringsTable sst = reader.getSharedStringsTable();
+
+        // Pega a primeira planilha do arquivo
+        InputStream sheet = reader.getSheetsData().next();
+
+        // Cria um parser SAX para ler linha por linha
+        SAXParserFactory saxFactory = SAXParserFactory.newInstance();
+        SAXParser saxParser = saxFactory.newSAXParser();
+        XMLReader xmlReader = saxParser.getXMLReader();
+
+        // Define o handler que processa as linhas e células
+        xmlReader.setContentHandler(new SheetHandler(sst));
+
+        // Começa a leitura
+        xmlReader.parse(new InputSource(sheet));
+
+        sheet.close();
+    }
+
+    // Handler SAX: aqui processamos cada célula e linha
+    private static class SheetHandler extends DefaultHandler {
+        private SharedStringsTable sst;
+        private String lastContents;
+        private boolean nextIsString;
+        private int rowNumber = 0;
+
+        public SheetHandler(SharedStringsTable sst) {
+            this.sst = sst;
+        }
+
+        @Override
+        public void startElement(String uri, String localName, String name, Attributes attributes) {
+            // Quando encontra uma célula
+            if (name.equals("c")) {
+                String cellType = attributes.getValue("t");
+                nextIsString = cellType != null && cellType.equals("s");
+            }
+        }
+
+        @Override
+        public void endElement(String uri, String localName, String name) {
+            // Quando fecha uma célula
+            if (nextIsString && name.equals("v")) {
+                int idx = Integer.parseInt(lastContents);
+                lastContents = new XSSFRichTextString(sst.getEntryAt(idx)).toString();
+                nextIsString = false;
+            }
+
+            // Quando fecha uma célula
+            if (name.equals("v")) {
+                System.out.print(lastContents + "\t");
+            }
+
+            // Quando fecha uma linha
+            if (name.equals("row")) {
+                rowNumber++;
+                System.out.println(); // Quebra de linha na saída
+                if (rowNumber % 1000 == 0) {
+                    System.out.println("Processadas " + rowNumber + " linhas...");
+                }
+            }
+        }
+
+        @Override
+        public void characters(char[] ch, int start, int length) {
+            lastContents = new String(ch, start, length);
+        }
+    }
+}
