@@ -1,0 +1,42 @@
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.web.client.RestTemplate;
+
+import java.io.File;
+import java.io.FileInputStream;
+
+public class ExcelUploader {
+
+    public void processarArquivo(String caminhoArquivo) throws Exception {
+        FileInputStream fis = new FileInputStream(new File(caminhoArquivo));
+        Workbook workbook = new XSSFWorkbook(fis);
+        Sheet sheet = workbook.getSheetAt(0);
+
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "http://localhost:8080/seu-endpoint";
+
+        for (Row row : sheet) {
+            if (row.getRowNum() == 0) continue; // pular cabeçalho
+
+            String nome = row.getCell(0).getStringCellValue();
+            String email = row.getCell(1).getStringCellValue();
+            Long cluId = (long) row.getCell(2).getNumericCellValue(); // exemplo com ID do clube
+
+            // Criar objeto requestalunos
+            RequestAlunos aluno = new RequestAlunos(nome, email, cluId);
+
+            // Enviar requisição POST
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<RequestAlunos> request = new HttpEntity<>(aluno, headers);
+
+            restTemplate.postForEntity(url, request, Void.class);
+        }
+
+        workbook.close();
+        fis.close();
+    }
+}
