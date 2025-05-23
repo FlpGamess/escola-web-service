@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tabela com Paginação</title>
+  <style>
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 10px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+    }
+    @media (max-width: 600px) {
+      table, thead, tbody, th, td, tr {
+        display: block;
+      }
+      th {
+        display: none;
+      }
+      td {
+        position: relative;
+        padding-left: 50%;
+      }
+      td::before {
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        white-space: nowrap;
+        font-weight: bold;
+      }
+    }
+    button {
+      padding: 8px 16px;
+      margin-right: 8px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <table id="tabela">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nome</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <button onclick="voltarPagina()">Voltar</button>
+  <button onclick="proximaPagina()">Próxima Página</button>
+
+  <script>
+    const dados = Array.from({ length: 50 }, (_, i) => ({ id: i + 1, nome: `Item ${i + 1}` }));
+    const porPagina = 10;
+    let paginaAtual = 0;
+
+    function renderTabela() {
+      const tbody = document.querySelector("#tabela tbody");
+      tbody.innerHTML = "";
+      const inicio = paginaAtual * porPagina;
+      const fim = inicio + porPagina;
+      const paginaDados = dados.slice(inicio, fim);
+
+      for (const item of paginaDados) {
+        const row = document.createElement("tr");
+        row.innerHTML = `<td>${item.id}</td><td>${item.nome}</td>`;
+        tbody.appendChild(row);
+      }
+    }
+
+    function proximaPagina() {
+      const totalPaginas = Math.ceil(dados.length / porPagina);
+      if (paginaAtual < totalPaginas - 1) {
+        paginaAtual++;
+        renderTabela();
+      }
+    }
+
+    function voltarPagina() {
+      if (paginaAtual > 0) {
+        paginaAtual--;
+        renderTabela();
+      }
+    }
+
+    renderTabela();
+  </script>
+
+</body>
+</html>
