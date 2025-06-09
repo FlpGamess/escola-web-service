@@ -1,0 +1,45 @@
+/* Ajusta o espaço do body para não ficar atrás da navbar fixa */
+body {
+  background-color: #f8f9fa; /* Cor de fundo suave */
+  padding-top: 70px; /* Espaço igual à altura da navbar fixa */
+}
+
+/* Estilo da navbar */
+.navbar {
+  background-color: #90ee90 !important; /* Verde claro */
+}
+
+/* Cor do texto e borda dos botões da navbar */
+.navbar .navbar-brand,
+.navbar .nav-item .btn {
+  color: purple !important;       /* Texto roxo */
+  border-color: purple !important;/* Borda roxa */
+}
+
+/* Hover dos botões da navbar */
+.navbar .nav-item .btn:hover {
+  background-color: purple;       /* Fundo roxo */
+  color: white !important;        /* Texto branco no hover */
+}
+
+/* Área com scroll interno dentro do card de botões */
+.botao-scroll {
+  max-height: 300px;    /* Altura máxima do card */
+  overflow-y: auto;     /* Habilita scroll vertical */
+}
+
+/* Estilo da barra de rolagem (WebKit - Chrome, Edge, etc.) */
+.botao-scroll::-webkit-scrollbar {
+  width: 6px; /* Largura da barra de rolagem */
+}
+
+/* Estilo do botão da rolagem */
+.botao-scroll::-webkit-scrollbar-thumb {
+  background-color: #888;      /* Cor da barra */
+  border-radius: 10px;         /* Bordas arredondadas */
+}
+
+/* Hover da barra de rolagem */
+.botao-scroll::-webkit-scrollbar-thumb:hover {
+  background: #555;            /* Cor mais escura ao passar o mouse */
+}
