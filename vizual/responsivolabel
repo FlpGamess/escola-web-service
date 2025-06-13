@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Gráfico com Labels Dinâmicas</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    canvas {
+      max-width: 800px;
+      max-height: 400px;
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="meuGrafico"></canvas>
+
+<script>
+  // Criando o contexto do gráfico
+  const ctx = document.getElementById('meuGrafico').getContext('2d');
+
+  // Dados iniciais vazios
+  const dados = {
+    labels: [],
+    datasets: [{
+      label: 'Exemplo Dinâmico',
+      data: [],
+      borderColor: 'rgba(75, 192, 192, 1)',
+      tension: 0.4
+    }]
+  };
+
+  // Configuração do gráfico
+  const config = {
+    type: 'line',
+    data: dados,
+    options: {
+      responsive: true,
+      animation: false,
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  };
+
+  // Criando o gráfico
+  const meuGrafico = new Chart(ctx, config);
+
+  // Função para adicionar labels e dados em loop
+  let contador = 0;
+  const intervalo = setInterval(() => {
+    if (contador >= 20) {
+      clearInterval(intervalo);
+      return;
+    }
+
+    // Adiciona uma nova label e um dado aleatório
+    dados.labels.push('Label ' + contador);
+    dados.datasets[0].data.push(Math.floor(Math.random() * 100));
+
+    // Atualiza o gráfico
+    meuGrafico.update();
+
+    contador++;
+  }, 1000); // adiciona um ponto a cada segundo
+
+</script>
+
+</body>
+</html>
