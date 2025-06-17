@@ -1,0 +1,94 @@
+// App.jsx
+import React, { useState } from "react";
+import { Menubar } from "primereact/menubar";
+import { Dialog } from "primereact/dialog";
+import { Button } from "primereact/button";
+import "primereact/resources/themes/lara-light-indigo/theme.css";
+import "primereact/resources/primereact.min.css";
+import "primeicons/primeicons.css";
+
+// Componente de item da lista (pode ser separado em outro arquivo)
+function ItemLista({ itemLista }) {
+  return <li>{itemLista}</li>;
+}
+
+export default function App() {
+  // Estado do Dialog
+  const [visible, setVisible] = useState(false);
+
+  // Estado da lista de mercado
+  const [ListaMercado, setListaMercado] = useState([
+    "Carne",
+    "Lazanha",
+    "Salmão",
+    "Chipi Chipi",
+  ]);
+
+  // Adiciona um novo item na lista
+  const addelementolista = () => {
+    setListaMercado([...ListaMercado, "Novo item"]);
+  };
+
+  // Itens da navbar
+  const items = [
+    {
+      label: "Home",
+      icon: "pi pi-home",
+      command: () => alert("Você clicou em Home!"),
+    },
+    {
+      label: "Perfil",
+      icon: "pi pi-user",
+      command: () => alert("Você clicou em Perfil!"),
+    },
+    {
+      label: "Mais",
+      icon: "pi pi-bars",
+      items: [
+        {
+          label: "Configurações",
+          icon: "pi pi-cog",
+          command: () => setVisible(true),
+        },
+        {
+          label: "Sair",
+          icon: "pi pi-sign-out",
+          command: () => alert("Você clicou em Sair!"),
+        },
+      ],
+    },
+  ];
+
+  return (
+    <div className="p-3">
+      {/* Navbar */}
+      <Menubar model={items} />
+
+      {/* Dialog com a lista de mercado */}
+      <Dialog
+        header="Configurações - Lista de Mercado"
+        visible={visible}
+        onHide={() => setVisible(false)}
+        style={{ width: "50vw" }}
+        breakpoints={{ "960px": "75vw", "641px": "100vw" }}
+      >
+        <h2>Lista de Mercado</h2>
+
+        {/* Botão para adicionar novo item */}
+        <Button
+          label="Adicionar item"
+          icon="pi pi-plus"
+          className="mb-3"
+          onClick={addelementolista}
+        />
+
+        {/* Lista renderizada */}
+        <ul>
+          {ListaMercado.map((itemLista, index) => (
+            <ItemLista key={index} itemLista={itemLista} />
+          ))}
+        </ul>
+      </Dialog>
+    </div>
+  );
+}
