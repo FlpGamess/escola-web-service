@@ -1,0 +1,119 @@
+// src/graficoConfig.js
+
+export function gerarDadosGrafico(lista) {
+  return {
+    labels: lista,
+    datasets: [
+      {
+        label: "Itens do Mercado",
+        data: lista.map(() => Math.floor(Math.random() * 10 + 1)),
+        backgroundColor: "#42A5F5",
+      },
+    ],
+  };
+}
+
+export const opcoesGrafico = {
+  responsive: true,
+  plugins: {
+    legend: {
+      position: "top",
+    },
+  },
+};
+
+
+import React, { useState } from "react";
+import { Menubar } from "primereact/menubar";
+import { Dialog } from "primereact/dialog";
+import { Button } from "primereact/button";
+import { InputText } from "primereact/inputtext";
+import { Chart } from "primereact/chart";
+import { gerarDadosGrafico, opcoesGrafico } from "./graficoConfig";
+
+import "primereact/resources/themes/lara-light-indigo/theme.css";
+import "primereact/resources/primereact.min.css";
+import "primeicons/primeicons.css";
+
+function App() {
+  const [visible, setVisible] = useState(false);
+  const [listaMercado, setListaMercado] = useState([
+    "Carne",
+    "Lazanha",
+    "Salmão",
+    "Chipi Chipi",
+  ]);
+  const [novoItem, setNovoItem] = useState("");
+
+  const adicionarItem = () => {
+    if (novoItem.trim() === "") return;
+    setListaMercado([...listaMercado, novoItem]);
+    setNovoItem("");
+  };
+
+  const items = [
+    {
+      label: "Home",
+      icon: "pi pi-home",
+      command: () => alert("Você clicou em Home!"),
+    },
+    {
+      label: "Perfil",
+      icon: "pi pi-user",
+      command: () => alert("Você clicou em Perfil!"),
+    },
+    {
+      label: "Mais",
+      icon: "pi pi-bars",
+      items: [
+        {
+          label: "Configurações",
+          icon: "pi pi-cog",
+          command: () => setVisible(true),
+        },
+        {
+          label: "Sair",
+          icon: "pi pi-sign-out",
+          command: () => alert("Você clicou em Sair!"),
+        },
+      ],
+    },
+  ];
+
+  return (
+    <div className="p-4">
+      <Menubar model={items} />
+
+      <Dialog
+        header="Configurações"
+        visible={visible}
+        onHide={() => setVisible(false)}
+        style={{ width: "50vw" }}
+        breakpoints={{ "960px": "75vw", "641px": "100vw" }}
+      >
+        <p>Configurações do sistema podem ser colocadas aqui.</p>
+      </Dialog>
+
+      <h2 className="mt-4">Lista de Mercado</h2>
+      <div className="flex gap-2 mb-2">
+        <InputText
+          placeholder="Novo item"
+          value={novoItem}
+          onChange={(e) => setNovoItem(e.target.value)}
+        />
+        <Button label="Adicionar" icon="pi pi-plus" onClick={adicionarItem} />
+      </div>
+
+      <ul>
+        {listaMercado.map((item, idx) => (
+          <li key={idx}>{item}</li>
+        ))}
+      </ul>
+
+      <h3 className="mt-5">Gráfico dos Itens</h3>
+      <Chart type="bar" data={gerarDadosGrafico(listaMercado)} options={opcoesGrafico} />
+    </div>
+  );
+}
+
+export default App;
